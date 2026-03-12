@@ -36,10 +36,12 @@ Built with PHP templates, glassmorphism effects, particle animations, parallax s
   ```
   3. Configure config.php:
   ```bash
+  <?php
 define("ROOT", __DIR__. "/");
 
 define('TELEGRAM_TOKEN',    '1234567890:AAGH0WoHN9vM1IyNyBM4OY$KXCu6Ra6RhJMNF');
-define('TELEGRAM_CHAT_ID',  '1234567890'); 
+define('TELEGRAM_CHAT_ID',  '1234567890');
+?> 
 ```     
 4. Start a local PHP server:
 ```bash
