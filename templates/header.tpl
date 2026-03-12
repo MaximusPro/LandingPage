@@ -1,3 +1,13 @@
+<?php 
+session_start();
+
+// Генерируем токен один раз на сессию (или можно на каждый запрос страницы — как хочешь)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

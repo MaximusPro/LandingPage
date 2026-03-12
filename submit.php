@@ -1,4 +1,22 @@
 <?php
+require("config.php");
+
+session_start();
+
+header('Content-Type: application/json');
+
+// Вариант A — если отправляешь как поле
+$received_token = $_POST['csrf_token'] ?? '';
+
+// Вариант B — если отправляешь в заголовке
+// $received_token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+
+// Проверка
+if (!isset($_SESSION['csrf_token']) || $received_token !== $_SESSION['csrf_token']) {
+    http_response_code(403);
+    echo json_encode(['error' => 'CSRF token invalid']);
+    exit;
+}
 
 if (in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', 'localhost'])) {
     ini_set('display_errors', 1);
@@ -15,7 +33,7 @@ $name    = $_POST['name']    ?? '';
 $email   = $_POST['email']   ?? '';
 $subject = $_POST['subject'] ?? '';
 $message = $_POST['message'] ?? '';
-
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 // Очень базовая очистка (лучше использовать filter_var + валидацию)
 $name    = trim(strip_tags($name));
 $email   = trim(filter_var($email, FILTER_SANITIZE_EMAIL));
@@ -72,6 +90,24 @@ echo json_encode([
     'status'  => 'success',
     'message' => 'Сигнал принят в матрицу! (почта отключена для теста)'
 ]);
+
+$TelegramText = "<b>ESTABLISH CONNECTION</b>\n\n" .
+           "Date: " . date('d.m.Y H:i') . "\n" .
+           "Name: " . htmlspecialchars($name) . "\n" .
+           "Email: " . htmlspecialchars($email) . "\n" .
+           "Subject: " . htmlspecialchars($subject) . "\n" .
+           "Massage: " . htmlspecialchars($message) . "\n" .
+           "IP: " . $ip;
+
+$TelegramUrl = "https://api.telegram.org/bot" . TELEGRAM_TOKEN .
+          "/sendMessage?chat_id=" . TELEGRAM_CHAT_ID .
+          "&text=" . urlencode($TelegramText) .
+          "&parse_mode=HTML";
+@file_get_contents($TelegramUrl);
+
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+echo json_encode(['success' => true]);
 exit;
 
 ?>

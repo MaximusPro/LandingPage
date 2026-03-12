@@ -186,6 +186,7 @@ include(ROOT. "templates/header.tpl");
             </div>
             
             <form id="leadForm" method="POST" class="contact-form glass" action="submit.php">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
     <div class="form-group">
         <input type="text" name="name" placeholder="Neural ID (Name)" required>
     </div>
